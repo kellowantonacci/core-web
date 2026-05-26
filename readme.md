@@ -1,86 +1,36 @@
-# Техническая спецификация: Core-web
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 1. Концепция продукта
-**Core-web** — это статичная интерактивная платформа-витрина уникальных дизайн-систем и UI-шаблонов. Главная задача платформы — конвертировать визуальные интерфейсы в высокоточные, машинно-ориентированные текстовые промпты на английском языке для последующей генерации кода в ИИ-агентах (v0, Lovable, Bolt.new, Cursor).
+## Getting Started
 
-**Важно:** Платформа **не использует** интеграцию с AI-сервисами (API) под капотом. Вся логика генерации промптов основана на строгих алгоритмах конкатенации заранее подготовленных метаданных (JSON/XML). 
+First, run the development server:
 
-## 2. Технологический Стек
-* **Фреймворк:** Next.js 15 (App Router, strict TypeScript) — SSG/CSR без тяжелого бэкенда.
-* **Стилизация:** Tailwind CSS + Shadcn/ui (Radix Primitives).
-* **Данные и Кэш:** TanStack Query v5 (React Query).
-* **Состояние:** Zustand (минималистичный глобальный стор).
-* **Иконки:** Масштабируемые SVG-векторы для обеспечения идеальной четкости и строгой стилистики (Lucide React / Custom Inline SVG).
-
-## 3. Спецификация Функционала и Интерфейса
-
-### 3.1. Навигация и Управление (Keyboard-First подход)
-Интерфейс оптимизирован для быстрого переключения без обязательного использования мыши:
-* **Стрелки Влево / Вправо:** Мгновенное переключение между 15 базовыми уникальными структурными темами (изменение формы, сетки, эффектов).
-* **Стрелки Вверх / Вниз:** Циклическое переключение между предустановленными цветовыми палитрами внутри текущей выбранной темы.
-
-### 3.2. Интерактивная Витрина Компонентов (UI Kitchen Sink)
-На экране каждой темы отображается интерактивный дашборд со всеми базовыми UI-элементами, чтобы дизайн можно было оценить в действии:
-* **Кнопки (Buttons):** Primary, Secondary, Outline, Ghost, Link. Состояния: Покой, Hover, Active, Focus, Disabled, индикатор загрузки.
-* **Элементы ввода (Inputs):** Текстовые поля (Text Input), Textarea, выпадающие списки (Select), поля с иконками. Состояния: Покой, Focus, Error (с валидацией), Success.
-* **Переключатели и выбор:** Toggle/Switch, Checkbox, Radio Group.
-* **Контейнеры:** Карточки (Cards), бейджи/теги (Badges), всплывающие подсказки (Tooltips).
-* **Навигационные блоки:** Хедер (Header), Сайдбар (Sidebar), модальные окна (Dialog/Modal).
-
-### 3.3. Система Избранного (Управление Коллекциями)
-* **Быстрая отметка («Тема понравилась»):** Кнопка-лайк для мгновенного добавления текущей комбинации геометрии и цвета в локальный стор (Zustand).
-* **Кнопка «Показать все понравившиеся темы»:** Фильтрация витрины для отображения только выбранных пресетов.
-* **Кнопка «Сбросить все понравившиеся темы»:** Очистка списка избранного.
-* **Массовый экспорт («Copy All Liked»):** Генерация комплексного промпта, описывающего сразу несколько визуальных направлений (например, для запроса A/B вариантов у ИИ).
-
-## 4. Движок экспорта промптов (Prompt Engine)
-Ключевая фича сайта — кнопка **«Copy Design Prompt»**. При клике локальный скрипт мгновенно собирает параметры выбранной темы и формирует технический промпт на **английском языке**.
-
-Согласно мировым практикам Prompt Engineering, итоговый текст структурируется с помощью XML-тегов, чтобы LLM безошибочно считывала дизайн-токены:
-
-```xml
-<system_instruction>
-You are an expert UI/UX developer. Build the interface using Next.js, Tailwind CSS, and shadcn/ui. Strictly follow the design tokens below. Do not hallucinate colors or spacings. Ensure minimalist, scalable SVG usage for icons.
-</system_instruction>
-
-<design_tokens>
-  <mode>dark</mode>
-  <colors>
-    <primary>#3B82F6</primary>
-    <background>#0F172A</background>
-    <surface>#1E293B</surface>
-    <border>#334155</border>
-  </colors>
-  <geometry>
-    <border-radius>0px</border-radius>
-    <box-shadow>none</box-shadow>
-  </geometry>
-  <effects>
-    <backdrop-filter>blur(12px)</backdrop-filter>
-  </effects>
-</design_tokens>
-
-<components_override>
-  <!-- Specific rules for buttons, inputs, and strict layout properties -->
-</components_override>
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## 5. Архитектура Тем и Стилизация
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### 5.2. Правило Абсолютной Уникальности
-Каждая из 15 запланированных тем — это самостоятельное визуальное решение, а не просто смена палитры. Различия кроются в физике интерфейса:
-* **Скругления (`border-radius`):** От абсолютно острых углов (0px) до мягких (12-16px) и полностью округлых форм (pill-shape).
-* **Объем и Слои:** Плоский дизайн (Flat), глубокие тени, неоморфизм (вдавленные/выпуклые элементы).
-* **Эффекты фона:** Стеклянные панели (Glassmorphism), градиентные рамки, фоновые шумы.
-* **Анимации:** От мгновенного отклика до плавных затуханий или пружинистых (`spring`) эффектов.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-### 5.3. Принцип Масштабирования (Мультипликатор Дизайна)
-* Создается **15 уникальных геометрических каркасов**.
-* К ним привязывается движок смены палитр (через стрелки вверх/вниз). Геометрия остается неизменной, а цвета меняются "на лету" из заранее заданных сетов.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 6. Пайплайн и Процесс Разработки
-Во избежание ошибок и для сохранения высокого качества UI/UX, разработка ведется строго итеративно:
-1. **Проектирование Темы №1:** Полная верстка всех UI-компонентов, настройка физики и логики сборки XML-промпта.
-2. **Тестирование генерации:** Копирование промпта Темы №1 и проверка в реальных ИИ-агентах на точность воссоздания верстки.
-3. **Утверждение (Апрув):** Фиксация структуры и JSON-параметров Темы №1.
-4. **Переход к следующей теме:** Разработка Темы №2 начинается **только** после полного утверждения Темы №1. Одновременная разработка всех 15 тем строго запрещена.
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
