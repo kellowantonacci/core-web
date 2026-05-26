@@ -28,7 +28,7 @@ graph TD
 Контрасты и состояния взаимодействия формируются динамически с помощью наложения нейтральных альфа-композитов и функций смешивания цветов OKLCH.
 
 ### 1. Объявление токенов и тем
-Все настройки тем описаны в [themes.ts](file:///c:/Users/TopMob/Documents/Projects/kellowant/core-web/src/config/themes.ts). Каждая тема включает:
+Все настройки тем описаны в [themes.ts](../src/config/themes.ts). Каждая тема включает:
 *   `tokens.geometry`: радиусы скруглений, толщина рамок, тени.
 *   `tokens.effects`: сложные фильтры (например, Backdrop Blur).
 *   `tokens.animation`: длительность переходов, функции плавности (кривые Безье), ховер/актив трансформации.
@@ -45,7 +45,7 @@ graph TD
 
 ## 🔌 Механизм инжектирования стилей
 
-Инжектор стилей [ThemeInjector.tsx](file:///c:/Users/TopMob/Documents/Projects/kellowant/core-web/src/components/ThemeInjector.tsx) слушает изменения активной темы и палитры в Zustand-сторе и обновляет корневой элемент страницы:
+Инжектор стилей [ThemeInjector.tsx](../src/components/ThemeInjector.tsx) слушает изменения активной темы и палитры в Zustand-сторе и обновляет корневой элемент страницы:
 
 1.  **Конвертация цветов в HSL**: Вспомогательная функция `hexToHsl` преобразует HEX-цвета палитры в HSL-компоненты. Это необходимо для совместимости с дизайн-системой Shadcn UI и нативной работы прозрачности в Tailwind.
 2.  **Запись в `:root`**: Записывает значения цветов во встроенные переменные (`--background`, `--foreground`, `--primary`, `--border`, `--ring` и т.д.).
@@ -67,7 +67,7 @@ graph TD
 ## 💾 Управление состоянием и навигация
 
 ### Состояние (Zustand Store)
-Хранилище [useThemeStore.ts](file:///c:/Users/TopMob/Documents/Projects/kellowant/core-web/src/store/useThemeStore.ts) управляет следующими параметрами:
+Хранилище [useThemeStore.ts](../src/store/useThemeStore.ts) управляет следующими параметрами:
 *   `activeThemeIndex` (выбранная геометрия темы)
 *   `activePaletteIndex` (выбранная цветовая схема)
 *   `likedKeys` (массив избранных сочетаний в формате `themeId:paletteId`)
@@ -76,7 +76,7 @@ graph TD
 Состояние автоматически сохраняется в `localStorage` браузера с помощью middleware `persist`.
 
 ### Клавиатурная навигация
-Хук [useKeyboardNavigation.ts](file:///c:/Users/TopMob/Documents/Projects/kellowant/core-web/src/hooks/useKeyboardNavigation.ts) перехватывает нажатия клавиш на уровне `window`:
+Хук [useKeyboardNavigation.ts](../src/hooks/useKeyboardNavigation.ts) перехватывает нажатия клавиш на уровне `window`:
 *   `ArrowLeft` / `ArrowRight` — переключение геометрии тем.
 *   `ArrowUp` / `ArrowDown` — переключение палитры.
 
@@ -87,7 +87,7 @@ graph TD
 
 ## ⚙️ Генератор AI-промптов (Prompt Engine)
 
-Библиотека [promptEngine.ts](file:///c:/Users/TopMob/Documents/Projects/kellowant/core-web/src/lib/promptEngine.ts) отвечает за экспорт активной темы в структурированный XML-формат. 
+Библиотека [promptEngine.ts](../src/lib/promptEngine.ts) отвечает за экспорт активной темы в структурированный XML-формат. 
 
 Полученный промпт передается AI-моделям (например, Claude или Gemini) для генерации кода новых страниц, гарантируя соблюдение следующих правил:
 1.  **Strict Mode**: Запрет на галлюцинацию цветов и отступов за рамками переданных токенов.
@@ -100,7 +100,7 @@ graph TD
 
 При создании новых интерактивных элементов интерфейса **запрещено** использовать фиксированные классы скруглений (`rounded-md`, `rounded-full`), рамок (`border-2`) или теней (`shadow-lg`). 
 
-Вместо этого необходимо применять утилиты, определенные в [globals.css](file:///c:/Users/TopMob/Documents/Projects/kellowant/core-web/src/app/globals.css):
+Вместо этого необходимо применять утилиты, определенные в [globals.css](../src/app/globals.css):
 
 1.  **Рамка и геометрия**: Используйте утилиту `border-theme` (задает толщину и стиль границ).
 2.  **Скругление**: Используйте утилиту `rounded-theme` (динамически скругление углов).
