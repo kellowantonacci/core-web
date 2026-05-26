@@ -132,3 +132,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@utility border-theme {
+  border-width: var(--theme-border-width);
+  border-style: solid;
+}
+@utility border-t-theme {
+  border-top-width: var(--theme-border-width);
+  border-top-style: solid;
+}
+@utility border-b-theme {
+  border-bottom-width: var(--theme-border-width);
+  border-bottom-style: solid;
+}
+@utility rounded-theme {
+  border-radius: var(--theme-border-radius);
+}
+@utility shadow-theme {
+  box-shadow: var(--theme-box-shadow);
+}
+@utility duration-theme {
+  transition-duration: var(--theme-transition-duration);
+}
+@utility ease-theme {
+  transition-timing-function: var(--theme-transition-timing-function);
+}
+@utility theme-backdrop {
+  backdrop-filter: var(--theme-backdrop-filter);
+  -webkit-backdrop-filter: var(--theme-backdrop-filter);
+}
+

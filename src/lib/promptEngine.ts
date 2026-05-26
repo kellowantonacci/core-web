@@ -17,19 +17,20 @@ You are an expert UI/UX developer. Build the interface using Next.js, Tailwind C
     <border-radius>${theme.tokens.geometry.borderRadius}</border-radius>
     <border-width>${theme.tokens.geometry.borderWidth}</border-width>
     <box-shadow>${theme.tokens.geometry.boxShadow}</box-shadow>
+    <active-box-shadow>${theme.tokens.geometry.activeBoxShadow}</active-box-shadow>
   </geometry>
   <effects>
     <backdrop-filter>${theme.tokens.effects.backdropFilter}</backdrop-filter>
   </effects>
   <animation>
-    <transition-duration>${theme.tokens.animation.transitionDuration}</transition-duration>
-    <transition-timing-function>${theme.tokens.animation.transitionTimingFunction}</transition-timing-function>
+    <transition-duration>${theme.tokens.animation.duration}</transition-duration>
+    <transition-timing-function>${theme.tokens.animation.timingFunction}</transition-timing-function>
+    <active-translate-x>${theme.tokens.animation.activeTranslateX}</active-translate-x>
+    <active-translate-y>${theme.tokens.animation.activeTranslateY}</active-translate-y>
   </animation>
 </design_tokens>
 
 <components_override>
-  <!-- Implement specific UI components following the strict rules of ${theme.name} (${theme.description}). -->
-  <!-- Apply geometry, effects, and animations to Buttons, Inputs, Cards, etc. -->
-</components_override>
-`;
+${theme.componentRules.map((rule) => `  <rule>${rule}</rule>`).join("\n")}
+</components_override>`;
 }

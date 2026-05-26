@@ -1,80 +1,79 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { themes } from '@/config/themes';
 
-interface LikedTheme {
-  themeId: string;
-  paletteIndex: number;
-}
-
-interface ThemeState {
-  activeThemeId: string;
+type ThemeStore = {
+  activeThemeIndex: number;
   activePaletteIndex: number;
-  likedThemes: LikedTheme[];
+  likedKeys: string[];
   showLikedOnly: boolean;
+  nextTheme: () => void;
+  previousTheme: () => void;
+  nextPalette: () => void;
+  previousPalette: () => void;
+  selectPalette: (paletteIndex: number) => void;
+  toggleLiked: () => void;
+  resetLiked: () => void;
+  toggleLikedFilter: () => void;
+};
 
-  setActiveThemeId: (id: string) => void;
-  setActivePaletteIndex: (index: number) => void;
-
-  toggleLikeCurrentTheme: () => void;
-  clearLikedThemes: () => void;
-  setShowLikedOnly: (show: boolean) => void;
-
-  nextTheme: (_totalThemes: number) => void;
-  prevTheme: (_totalThemes: number) => void;
-  nextPalette: (totalPalettes: number) => void;
-  prevPalette: (totalPalettes: number) => void;
-}
-
-export const useThemeStore = create<ThemeState>()(
+export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      activeThemeId: 'wireframe', // Initial theme
+      activeThemeIndex: 0,
       activePaletteIndex: 0,
-      likedThemes: [],
+      likedKeys: [],
       showLikedOnly: false,
-
-      setActiveThemeId: (id) => set({ activeThemeId: id }),
-      setActivePaletteIndex: (index) => set({ activePaletteIndex: index }),
-
-      toggleLikeCurrentTheme: () => {
-        const { activeThemeId, activePaletteIndex, likedThemes } = get();
-        const exists = likedThemes.find(
-          (t) => t.themeId === activeThemeId && t.paletteIndex === activePaletteIndex
-        );
-
-        if (exists) {
-          set({
-            likedThemes: likedThemes.filter(
-              (t) => !(t.themeId === activeThemeId && t.paletteIndex === activePaletteIndex)
-            ),
-          });
-        } else {
-          set({
-            likedThemes: [...likedThemes, { themeId: activeThemeId, paletteIndex: activePaletteIndex }],
-          });
-        }
+      nextTheme: () => {
+        const { activeThemeIndex } = get();
+        set({
+          activeThemeIndex: (activeThemeIndex + 1) % themes.length,
+          activePaletteIndex: 0,
+        });
       },
-
-      clearLikedThemes: () => set({ likedThemes: [] }),
-
-      setShowLikedOnly: (show) => set({ showLikedOnly: show }),
-
-      nextTheme: (_totalThemes) => {
-        // Implement simple increment for now, logic will depend on themes array
-        // We'll manage this in a hook or component passing the length
+      previousTheme: () => {
+        const { activeThemeIndex } = get();
+        set({
+          activeThemeIndex:
+            (activeThemeIndex - 1 + themes.length) % themes.length,
+          activePaletteIndex: 0,
+        });
       },
-      prevTheme: (_totalThemes) => {},
-      nextPalette: (totalPalettes) => {
-        const { activePaletteIndex } = get();
-        set({ activePaletteIndex: (activePaletteIndex + 1) % totalPalettes });
+      nextPalette: () => {
+        const { activeThemeIndex, activePaletteIndex } = get();
+        const paletteCount = themes[activeThemeIndex].palettes.length;
+        set({ activePaletteIndex: (activePaletteIndex + 1) % paletteCount });
       },
-      prevPalette: (totalPalettes) => {
-        const { activePaletteIndex } = get();
-        set({ activePaletteIndex: (activePaletteIndex - 1 + totalPalettes) % totalPalettes });
+      previousPalette: () => {
+        const { activeThemeIndex, activePaletteIndex } = get();
+        const paletteCount = themes[activeThemeIndex].palettes.length;
+        set({
+          activePaletteIndex: (activePaletteIndex - 1 + paletteCount) % paletteCount,
+        });
       },
+      selectPalette: (paletteIndex) => set({ activePaletteIndex: paletteIndex }),
+      toggleLiked: () => {
+        const { activeThemeIndex, activePaletteIndex, likedKeys } = get();
+        const theme = themes[activeThemeIndex];
+        const palette = theme.palettes[activePaletteIndex];
+        const key = `${theme.id}:${palette.id}`;
+        const exists = likedKeys.includes(key);
+
+        set({
+          likedKeys: exists ? likedKeys.filter((item) => item !== key) : [...likedKeys, key],
+        });
+      },
+      resetLiked: () => set({ likedKeys: [], showLikedOnly: false }),
+      toggleLikedFilter: () => set((state) => ({ showLikedOnly: !state.showLikedOnly })),
     }),
     {
-      name: 'core-web-theme-storage',
-    }
+      name: "core-web-theme-store",
+      partialize: (state) => ({
+        activeThemeIndex: state.activeThemeIndex,
+        activePaletteIndex: state.activePaletteIndex,
+        likedKeys: state.likedKeys,
+        showLikedOnly: state.showLikedOnly,
+      }),
+    },
   )
 );
