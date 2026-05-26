@@ -26,29 +26,35 @@ export const useThemeStore = create<ThemeStore>()(
       showLikedOnly: false,
       nextTheme: () => {
         const { activeThemeIndex } = get();
+        const safeIndex = activeThemeIndex >= themes.length || activeThemeIndex < 0 ? 0 : activeThemeIndex;
         set({
-          activeThemeIndex: (activeThemeIndex + 1) % themes.length,
+          activeThemeIndex: (safeIndex + 1) % themes.length,
           activePaletteIndex: 0,
         });
       },
       previousTheme: () => {
         const { activeThemeIndex } = get();
+        const safeIndex = activeThemeIndex >= themes.length || activeThemeIndex < 0 ? 0 : activeThemeIndex;
         set({
           activeThemeIndex:
-            (activeThemeIndex - 1 + themes.length) % themes.length,
+            (safeIndex - 1 + themes.length) % themes.length,
           activePaletteIndex: 0,
         });
       },
       nextPalette: () => {
         const { activeThemeIndex, activePaletteIndex } = get();
-        const paletteCount = themes[activeThemeIndex].palettes.length;
-        set({ activePaletteIndex: (activePaletteIndex + 1) % paletteCount });
+        const theme = themes[activeThemeIndex] ?? themes[0];
+        const paletteCount = theme.palettes.length;
+        const safePaletteIndex = activePaletteIndex >= paletteCount || activePaletteIndex < 0 ? 0 : activePaletteIndex;
+        set({ activePaletteIndex: (safePaletteIndex + 1) % paletteCount });
       },
       previousPalette: () => {
         const { activeThemeIndex, activePaletteIndex } = get();
-        const paletteCount = themes[activeThemeIndex].palettes.length;
+        const theme = themes[activeThemeIndex] ?? themes[0];
+        const paletteCount = theme.palettes.length;
+        const safePaletteIndex = activePaletteIndex >= paletteCount || activePaletteIndex < 0 ? 0 : activePaletteIndex;
         set({
-          activePaletteIndex: (activePaletteIndex - 1 + paletteCount) % paletteCount,
+          activePaletteIndex: (safePaletteIndex - 1 + paletteCount) % paletteCount,
         });
       },
       selectPalette: (paletteIndex) => set({ activePaletteIndex: paletteIndex }),

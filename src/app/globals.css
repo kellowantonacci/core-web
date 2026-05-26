@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
 }
 
 :root {
@@ -124,8 +124,8 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    transition-duration: var(--transition-duration);
-    transition-timing-function: linear;
+    transition-duration: var(--theme-transition-duration, 150ms);
+    transition-timing-function: var(--theme-transition-timing-function, linear);
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   }
   body {
@@ -136,14 +136,19 @@
 @utility border-theme {
   border-width: var(--theme-border-width);
   border-style: solid;
+  clip-path: var(--theme-clip-path, none);
+  mix-blend-mode: var(--theme-mix-blend-mode, normal);
+  transform: var(--theme-transform, none);
 }
 @utility border-t-theme {
   border-top-width: var(--theme-border-width);
   border-top-style: solid;
+  clip-path: var(--theme-clip-path, none);
 }
 @utility border-b-theme {
   border-bottom-width: var(--theme-border-width);
   border-bottom-style: solid;
+  clip-path: var(--theme-clip-path, none);
 }
 @utility rounded-theme {
   border-radius: var(--theme-border-radius);
@@ -160,5 +165,70 @@
 @utility theme-backdrop {
   backdrop-filter: var(--theme-backdrop-filter);
   -webkit-backdrop-filter: var(--theme-backdrop-filter);
+  mix-blend-mode: var(--theme-mix-blend-mode, normal);
+}
+@utility theme-interactive {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-duration: var(--theme-transition-duration);
+  transition-timing-function: var(--theme-transition-timing-function);
+  clip-path: var(--theme-clip-path, none);
+  mix-blend-mode: var(--theme-mix-blend-mode, normal);
+
+  &:hover:not(:disabled) {
+    transform: var(--theme-transform, none) var(--theme-hover-transform, none);
+  }
+
+  &:active:not(:disabled) {
+    transform: var(--theme-transform, none) var(--theme-active-transform, none);
+    box-shadow: var(--theme-active-box-shadow, var(--theme-box-shadow));
+  }
+}
+@utility theme-grid-bg {
+  background-image: 
+    linear-gradient(to right, color-mix(in srgb, var(--theme-border) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--theme-border) 16%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--theme-background);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--theme-border) 80%, transparent);
+  border-radius: var(--theme-border-radius, 4px);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-foreground);
+}
+
+/* Retro CRT Terminal Styles for Monospaced Theme */
+.font-mono {
+  /* Dynamic text-shadow glow mapping to active foreground color */
+  h1, h2, h3, h4, h5, h6, button, label, select, input, textarea, pre, span, p, div {
+    text-shadow: 0 0 3px color-mix(in srgb, var(--theme-foreground) 40%, transparent);
+  }
+}
+
+/* CRT Scanlines Overlay */
+.font-mono::after {
+  content: "";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  background-size: 100% 4px, 6px 100%;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: var(--theme-decorations-opacity, 0.3);
 }
 

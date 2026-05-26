@@ -12,6 +12,10 @@ You are an expert UI/UX developer. Build the interface using Next.js, Tailwind C
     <background>${palette.colors.background}</background>
     <surface>${palette.colors.surface}</surface>
     <border>${palette.colors.border}</border>
+    <muted>${palette.colors.muted}</muted>
+    <accent>${palette.colors.accent}</accent>
+    <success>${palette.colors.success}</success>
+    <error>${palette.colors.error}</error>
   </colors>
   <geometry>
     <border-radius>${theme.tokens.geometry.borderRadius}</border-radius>
@@ -27,6 +31,8 @@ You are an expert UI/UX developer. Build the interface using Next.js, Tailwind C
     <transition-timing-function>${theme.tokens.animation.timingFunction}</transition-timing-function>
     <active-translate-x>${theme.tokens.animation.activeTranslateX}</active-translate-x>
     <active-translate-y>${theme.tokens.animation.activeTranslateY}</active-translate-y>
+    <hover-transform>${theme.tokens.animation.hoverTransform}</hover-transform>
+    <active-transform>${theme.tokens.animation.activeTransform}</active-transform>
   </animation>
 </design_tokens>
 

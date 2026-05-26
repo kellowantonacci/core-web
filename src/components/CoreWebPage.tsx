@@ -82,6 +82,7 @@ export function CoreWebPage() {
   const activeKey = `${theme.id}:${palette.id}`;
   const isLiked = likedKeys.includes(activeKey);
   const prompt = generatePrompt(theme, palette);
+  const themeNumber = String(activeThemeIndex + 1).padStart(2, "0");
   const paletteCards = theme.palettes.map((item, index) => ({
     index,
     palette: item,
@@ -156,14 +157,30 @@ export function CoreWebPage() {
   return (
     <Tooltip.Provider delayDuration={0}>
       <main
-        className="min-h-screen bg-[var(--theme-background)] text-[var(--theme-foreground)]"
+        className="relative min-h-screen bg-[var(--theme-background)] text-[var(--theme-foreground)] overflow-hidden"
         style={{ transitionDuration: "0ms", transitionTimingFunction: "linear" }}
       >
-        <div className="mx-auto grid min-h-screen max-w-[1600px] grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+        {/* Ambient grid background */}
+        <div
+          className="pointer-events-none absolute inset-0 theme-grid-bg transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: `calc(var(--theme-decorations-opacity, 0.15) * 0.45)` }}
+        />
+
+        {/* Ambient glow blobs */}
+        <div
+          className="pointer-events-none absolute -left-48 -top-48 h-96 w-96 rounded-full bg-[var(--theme-accent)] blur-[100px] transition-all duration-1000 ease-in-out"
+          style={{ opacity: `calc(var(--theme-decorations-opacity, 0.15) * 0.8)` }}
+        />
+        <div
+          className="pointer-events-none absolute -right-48 -bottom-48 h-96 w-96 rounded-full bg-[var(--theme-primary)] blur-[120px] transition-all duration-1000 ease-in-out"
+          style={{ opacity: `calc(var(--theme-decorations-opacity, 0.15) * 0.6)` }}
+        />
+
+        <div className="relative mx-auto grid min-h-screen max-w-[1600px] grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme theme-backdrop">
             <div className="border-b-theme border-[var(--theme-border)] px-4 py-4">
               <div className="text-xs uppercase tracking-[0.2em]">Core-web</div>
-              <div className="mt-2 text-2xl font-semibold">Style 0{activeThemeIndex + 1}</div>
+              <div className="mt-2 text-2xl font-semibold">Style {themeNumber}</div>
               <p className="mt-3 text-sm leading-6">{theme.description}</p>
             </div>
 
@@ -276,7 +293,7 @@ export function CoreWebPage() {
                               type="button"
                               onClick={() => selectPalette(index)}
                               className={cn(
-                                "border-theme border-[var(--theme-border)] p-4 text-left outline-none rounded-theme shadow-theme transition-all duration-theme ease-theme hover:bg-[var(--theme-muted)] hover:[transform:var(--theme-hover-transform)] active:translate-x-[var(--theme-active-translate-x)] active:translate-y-[var(--theme-active-translate-y)] active:shadow-[var(--theme-active-box-shadow)]",
+                                "border-theme border-[var(--theme-border)] p-4 text-left outline-none rounded-theme shadow-theme hover:bg-[var(--theme-muted)] theme-interactive",
                                 selected && "bg-[var(--theme-muted)] border-[var(--theme-foreground)]",
                               )}
                             >
@@ -292,13 +309,13 @@ export function CoreWebPage() {
 
                               <div className="mt-4 grid grid-cols-4 gap-2">
                                 {[
-                                  presetPalette.colors.primary,
-                                  presetPalette.colors.background,
-                                  presetPalette.colors.surface,
-                                  presetPalette.colors.border,
-                                ].map((color) => (
+                                  ["primary", presetPalette.colors.primary],
+                                  ["background", presetPalette.colors.background],
+                                  ["surface", presetPalette.colors.surface],
+                                  ["border", presetPalette.colors.border],
+                                ].map(([name, color]) => (
                                   <span
-                                    key={color}
+                                    key={name}
                                     className="h-10 border-theme border-[var(--theme-border)] rounded-theme"
                                     style={{ background: color }}
                                   />
@@ -340,7 +357,7 @@ export function CoreWebPage() {
                         value={textValue}
                         onChange={(event) => setTextValue(event.target.value)}
                         className={cn(
-                          "h-10 w-full border-theme bg-[var(--theme-surface)] px-3 outline-none rounded-theme shadow-theme transition-all duration-theme ease-theme focus-visible:ring-2 focus-visible:ring-[var(--theme-border)]",
+                          "h-10 w-full border-theme bg-[var(--theme-surface)] px-3 outline-none rounded-theme shadow-theme focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)]",
                           textState === "error" && "bg-[var(--theme-error)]",
                           textState === "success" && "bg-[var(--theme-success)]",
                           "border-[var(--theme-border)]",
@@ -358,7 +375,7 @@ export function CoreWebPage() {
                         value={textareaValue}
                         onChange={(event) => setTextareaValue(event.target.value)}
                         className={cn(
-                          "min-h-24 w-full border-theme px-3 py-2 outline-none rounded-theme shadow-theme transition-all duration-theme ease-theme focus-visible:ring-2 focus-visible:ring-[var(--theme-border)]",
+                          "min-h-24 w-full border-theme px-3 py-2 outline-none rounded-theme shadow-theme focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)]",
                           textareaState === "error" && "bg-[var(--theme-error)]",
                           textareaState === "success" && "bg-[var(--theme-success)]",
                           textareaState === "idle" && "bg-[var(--theme-surface)]",
@@ -382,7 +399,7 @@ export function CoreWebPage() {
                   <Section title="Select / Switch / Checkbox / Radio">
                     <div className="space-y-4">
                       <Select.Root defaultValue="default">
-                        <Select.Trigger className="flex h-10 w-full items-center justify-between border-theme border-[var(--theme-border)] px-3 text-sm rounded-theme shadow-theme transition-all duration-theme ease-theme hover:bg-[var(--theme-muted)] hover:[transform:var(--theme-hover-transform)] active:translate-x-[var(--theme-active-translate-x)] active:translate-y-[var(--theme-active-translate-y)] active:shadow-[var(--theme-active-box-shadow)]">
+                        <Select.Trigger className="flex h-10 w-full items-center justify-between border-theme border-[var(--theme-border)] px-3 text-sm rounded-theme shadow-theme hover:bg-[var(--theme-muted)] theme-interactive">
                           <Select.Value placeholder="Select item" />
                           <Select.Icon>
                             <ChevronDown className="h-4 w-4" />
@@ -404,13 +421,13 @@ export function CoreWebPage() {
                         <Switch.Root
                           checked={switchEnabled}
                           onCheckedChange={setSwitchEnabled}
-                          className="flex h-6 w-11 items-center border-theme border-[var(--theme-border)] px-1 rounded-theme shadow-theme duration-theme ease-theme transition-all data-[state=checked]:bg-[var(--theme-primary)] hover:[transform:var(--theme-hover-transform)]"
+                          className="flex h-6 w-11 items-center border-theme border-[var(--theme-border)] px-1 rounded-theme shadow-theme data-[state=checked]:bg-[var(--theme-primary)] theme-interactive"
                         >
                           <Switch.Thumb className="block h-4 w-4 border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme duration-theme ease-theme transition-transform data-[state=checked]:translate-x-5" />
                         </Switch.Root>
                       </div>
 
-                      <label className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme transition-all duration-theme ease-theme hover:bg-[var(--theme-muted)] cursor-pointer hover:[transform:var(--theme-hover-transform)]">
+                      <label className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme hover:bg-[var(--theme-muted)] cursor-pointer theme-interactive">
                         <Checkbox.Root
                           checked={checkboxChecked}
                           onCheckedChange={(checked) => setCheckboxChecked(checked === true)}
@@ -428,7 +445,7 @@ export function CoreWebPage() {
                           ["a", "Option A"],
                           ["b", "Option B"],
                         ].map(([value, label]) => (
-                          <label key={value} className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme transition-all duration-theme ease-theme hover:bg-[var(--theme-muted)] cursor-pointer hover:[transform:var(--theme-hover-transform)]">
+                          <label key={value} className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme hover:bg-[var(--theme-muted)] cursor-pointer theme-interactive">
                             <RadioGroup.Item value={value} className="relative flex items-center justify-center h-5 w-5 border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme transition-all duration-theme ease-theme">
                               <RadioGroup.Indicator className="relative flex items-center justify-center h-full w-full after:block after:h-2 after:w-2 after:bg-[var(--theme-primary)] after:rounded-theme" />
                             </RadioGroup.Item>
