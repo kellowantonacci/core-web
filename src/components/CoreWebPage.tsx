@@ -1,24 +1,37 @@
 "use client";
 
-import * as Checkbox from "@radix-ui/react-checkbox";
-import * as Dialog from "@radix-ui/react-dialog";
-import * as RadioGroup from "@radix-ui/react-radio-group";
-import * as Select from "@radix-ui/react-select";
-import * as Switch from "@radix-ui/react-switch";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import {
-  Check,
-  ChevronDown,
   Copy,
   Heart,
   LoaderCircle,
   Menu,
   Search,
-  X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+
+import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { generatePrompt } from "@/lib/promptEngine";
 import { themes, totalPlannedThemes } from "@/config/themes";
 import { cn } from "@/lib/utils";
@@ -67,6 +80,7 @@ export function CoreWebPage() {
     resetLiked,
     toggleLikedFilter,
   } = useThemeStore();
+
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedLiked, setCopiedLiked] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -76,6 +90,9 @@ export function CoreWebPage() {
   const [checkboxChecked, setCheckboxChecked] = useState(true);
   const [radioValue, setRadioValue] = useState("a");
   const timeoutRef = useRef<number | null>(null);
+
+  // Подключаем кастомный хук навигации с клавиатуры
+  useKeyboardNavigation();
 
   const theme = themes[activeThemeIndex] ?? themes[0];
   const palette = theme.palettes[activePaletteIndex] ?? theme.palettes[0];
@@ -93,33 +110,6 @@ export function CoreWebPage() {
     : paletteCards;
   const textState = textValue.trim().length === 0 ? "idle" : textValue.trim().length < 4 ? "error" : "success";
   const textareaState = textareaValue.trim().length === 0 ? "idle" : textareaValue.trim().length < 12 ? "error" : "success";
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        previousTheme();
-      }
-
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        nextTheme();
-      }
-
-      if (event.key === "ArrowUp") {
-        event.preventDefault();
-        previousPalette();
-      }
-
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        nextPalette();
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [nextPalette, nextTheme, previousPalette, previousTheme]);
 
   useEffect(() => {
     return () => {
@@ -155,7 +145,7 @@ export function CoreWebPage() {
   }
 
   return (
-    <Tooltip.Provider delayDuration={0}>
+    <TooltipPrimitive.Provider delayDuration={0}>
       <main
         className="relative min-h-screen bg-[var(--theme-background)] text-[var(--theme-foreground)] overflow-hidden"
         style={{ transitionDuration: "0ms", transitionTimingFunction: "linear" }}
@@ -179,39 +169,39 @@ export function CoreWebPage() {
         <div className="relative mx-auto grid min-h-screen max-w-[1600px] grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme theme-backdrop">
             <div className="border-b-theme border-[var(--theme-border)] px-4 py-4">
-              <div className="text-xs uppercase tracking-[0.2em]">Core-web</div>
-              <div className="mt-2 text-2xl font-semibold">Style {themeNumber}</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Core-web</div>
+              <div className="mt-2 text-2xl font-semibold">Стиль {themeNumber}</div>
               <p className="mt-3 text-sm leading-6">{theme.description}</p>
             </div>
 
             <div className="space-y-4 p-4 text-sm">
               <div className="space-y-2 border-theme border-[var(--theme-border)] p-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                <div className="text-xs uppercase tracking-[0.2em]">Navigation</div>
-                <div>Left / Right: switch theme geometry</div>
-                <div>Up / Down: switch palette in current theme</div>
+                <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Навигация</div>
+                <div>Стрелки ← / →: переключить геометрию темы</div>
+                <div>Стрелки ↑ / ↓: переключить цветовую палитру</div>
               </div>
 
               <div className="space-y-2 border-theme border-[var(--theme-border)] p-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                <div className="text-xs uppercase tracking-[0.2em]">Scope</div>
-                <div>Implemented: {themes.length} of {totalPlannedThemes} planned themes</div>
-                <div>Current: {theme.name}</div>
-                <div>Palette: {palette.label}</div>
+                <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Область охвата</div>
+                <div>Реализовано: {themes.length} из {totalPlannedThemes} тем</div>
+                <div>Тема: {theme.name}</div>
+                <div>Палитра: {palette.label}</div>
               </div>
 
               <div className="space-y-2 border-theme border-[var(--theme-border)] p-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                <div className="text-xs uppercase tracking-[0.2em]">Stack</div>
+                <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Стек технологий</div>
                 <div>Next.js 16 App Router</div>
-                <div>Tailwind CSS v4</div>
+                <div>Tailwind CSS v4 (Rust Engine)</div>
                 <div>Radix UI + Base UI</div>
-                <div>Zustand store</div>
+                <div>Хранилище Zustand (Persist)</div>
               </div>
 
               <div className="space-y-2 border-theme border-[var(--theme-border)] p-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                <div className="text-xs uppercase tracking-[0.2em]">Geometry</div>
-                <div>Border radius: {theme.tokens.geometry.borderRadius}</div>
-                <div>Border width: {theme.tokens.geometry.borderWidth}</div>
-                <div>Shadow: {theme.tokens.geometry.boxShadow}</div>
-                <div>Transition: {theme.tokens.animation.duration}</div>
+                <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Токены геометрии</div>
+                <div>Радиус: {theme.tokens.geometry.borderRadius}</div>
+                <div>Толщина рамки: {theme.tokens.geometry.borderWidth}</div>
+                <div>Тени: {theme.tokens.geometry.boxShadow}</div>
+                <div>Длительность: {theme.tokens.animation.duration}</div>
               </div>
             </div>
           </aside>
@@ -220,24 +210,24 @@ export function CoreWebPage() {
             <header className="border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme theme-backdrop">
               <div className="flex flex-col gap-3 border-b-theme border-[var(--theme-border)] px-4 py-4 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.2em]">Interactive Showcase</div>
-                  <h1 className="mt-2 text-3xl font-semibold">{theme.name} Theme System</h1>
+                  <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Интерактивная витрина</div>
+                  <h1 className="mt-2 text-3xl font-semibold">Система тем {theme.name}</h1>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" onClick={previousTheme}>Prev Theme</Button>
-                  <Button variant="outline" onClick={nextTheme}>Next Theme</Button>
+                  <Button variant="outline" onClick={previousTheme}>Пред. тема</Button>
+                  <Button variant="outline" onClick={nextTheme}>След. тема</Button>
                   <Button variant="secondary" onClick={toggleLiked}>
-                    <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
-                    {isLiked ? "Liked" : "Like Theme"}
+                    <Heart className={cn("h-4 w-4", isLiked && "fill-current text-red-500")} />
+                    {isLiked ? "В избранном" : "В избранное"}
                   </Button>
                   <Button variant="secondary" onClick={toggleLikedFilter}>
-                    {showLikedOnly ? "Show All" : "Show Liked"}
+                    {showLikedOnly ? "Показать все" : "Только избранные"}
                   </Button>
-                  <Button variant="outline" onClick={resetLiked}>Reset Liked</Button>
+                  <Button variant="outline" onClick={resetLiked}>Сбросить лайки</Button>
                   <Button onClick={() => copyText(prompt, "single")}>
                     <Copy className="h-4 w-4" />
-                    {copiedPrompt ? "Copied" : "Copy Design Prompt"}
+                    {copiedPrompt ? "Скопировано!" : "Копировать промпт"}
                   </Button>
                   <Button
                     variant="outline"
@@ -245,20 +235,20 @@ export function CoreWebPage() {
                     disabled={likedKeys.length === 0}
                   >
                     <Copy className="h-4 w-4" />
-                    {copiedLiked ? "Copied" : "Copy All Liked"}
+                    {copiedLiked ? "Скопировано!" : "Копировать все лайкнутые"}
                   </Button>
                 </div>
               </div>
 
               <div className="grid gap-[var(--theme-border-width)] bg-[var(--theme-border)] md:grid-cols-4">
                 {[
-                  ["Theme", theme.name],
-                  ["Palette", palette.label],
-                  ["Liked Presets", String(likedKeys.length)],
-                  ["Filter", showLikedOnly ? "Liked presets only" : "All presets"],
+                  ["Тема", theme.name],
+                  ["Цветовая палитра", palette.label],
+                  ["В избранном", String(likedKeys.length)],
+                  ["Фильтрация", showLikedOnly ? "Только избранное" : "Все пресеты"],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-[var(--theme-surface)] px-4 py-3">
-                    <div className="text-xs uppercase tracking-[0.2em]">{label}</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/60">{label}</div>
                     <div className="mt-2 text-lg">{value}</div>
                   </div>
                 ))}
@@ -267,19 +257,19 @@ export function CoreWebPage() {
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
               <div className="space-y-4">
-                <Section title="Preset Collection">
+                <Section title="Коллекция пресетов">
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2 text-sm">
-                      <Button variant="outline" onClick={previousPalette}>Prev Palette</Button>
-                      <Button variant="outline" onClick={nextPalette}>Next Palette</Button>
-                      <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                        Visible presets: {visiblePaletteCards.length}
+                      <Button variant="outline" onClick={previousPalette}>Пред. палитра</Button>
+                      <Button variant="outline" onClick={nextPalette}>След. палитра</Button>
+                      <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme transition-all duration-theme ease-theme bg-[var(--theme-surface)]">
+                        Доступно пресетов: {visiblePaletteCards.length}
                       </div>
                     </div>
 
                     {visiblePaletteCards.length === 0 ? (
-                      <div className="border-theme border-[var(--theme-border)] p-4 text-sm leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                        No liked presets yet. Mark one or more palette combinations and enable the liked filter again.
+                      <div className="border-theme border-[var(--theme-border)] p-4 text-sm leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme bg-[var(--theme-surface)]">
+                        Пока нет пресетов в избранном. Отметьте сердечком одну или несколько палитр в шапке и попробуйте снова.
                       </div>
                     ) : (
                       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -293,17 +283,17 @@ export function CoreWebPage() {
                               type="button"
                               onClick={() => selectPalette(index)}
                               className={cn(
-                                "border-theme border-[var(--theme-border)] p-4 text-left outline-none rounded-theme shadow-theme hover:bg-[var(--theme-muted)] theme-interactive",
+                                "border-theme border-[var(--theme-border)] p-4 text-left outline-none rounded-theme shadow-theme hover:bg-[var(--theme-muted)] theme-interactive bg-[var(--theme-surface)]",
                                 selected && "bg-[var(--theme-muted)] border-[var(--theme-foreground)]",
                               )}
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div>
-                                  <div className="text-xs uppercase tracking-[0.2em]">{presetPalette.mode}</div>
+                                  <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">{presetPalette.mode === "dark" ? "Темный" : "Светлый"}</div>
                                   <div className="mt-2 text-lg font-medium">{presetPalette.label}</div>
                                 </div>
                                 <span className="border-theme border-[var(--theme-border)] px-2 py-1 text-xs uppercase rounded-theme">
-                                  {liked ? "Liked" : selected ? "Active" : "Preset"}
+                                  {liked ? "Лайкнут" : selected ? "Активен" : "Пресет"}
                                 </span>
                               </div>
 
@@ -322,10 +312,10 @@ export function CoreWebPage() {
                                 ))}
                               </div>
 
-                              <div className="mt-4 space-y-1 text-sm">
-                                <div>Primary: {presetPalette.colors.primary}</div>
-                                <div>Background: {presetPalette.colors.background}</div>
-                                <div>Border: {presetPalette.colors.border}</div>
+                              <div className="mt-4 space-y-1 text-xs text-[var(--theme-foreground)]/75">
+                                <div>Текст: {presetPalette.colors.primary}</div>
+                                <div>Фон: {presetPalette.colors.background}</div>
+                                <div>Рамка: {presetPalette.colors.border}</div>
                               </div>
                             </button>
                           );
@@ -336,59 +326,55 @@ export function CoreWebPage() {
                 </Section>
 
                 <div className="grid gap-4 lg:grid-cols-2">
-                  <Section title="Buttons">
+                  <Section title="Кнопки (Buttons)">
                     <div className="flex flex-wrap gap-3">
-                      <Button>Primary</Button>
-                      <Button variant="secondary">Secondary</Button>
-                      <Button variant="outline">Outline</Button>
-                      <Button variant="ghost">Ghost</Button>
-                      <Button variant="link">Link</Button>
-                      <Button disabled>Disabled</Button>
+                      <Button>Основная</Button>
+                      <Button variant="secondary">Вторичная</Button>
+                      <Button variant="outline">Контурная</Button>
+                      <Button variant="ghost">Призрачная</Button>
+                      <Button variant="link">Ссылка</Button>
+                      <Button disabled>Отключена</Button>
                       <Button>
                         <LoaderCircle className="h-4 w-4 animate-spin" />
-                        Loading
+                        Загрузка
                       </Button>
                     </div>
                   </Section>
 
-                  <Section title="Inputs">
+                  <Section title="Поля ввода (Inputs)">
                     <div className="space-y-3">
-                      <input
+                      <Input
                         value={textValue}
                         onChange={(event) => setTextValue(event.target.value)}
                         className={cn(
-                          "h-10 w-full border-theme bg-[var(--theme-surface)] px-3 outline-none rounded-theme shadow-theme focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)]",
-                          textState === "error" && "bg-[var(--theme-error)]",
-                          textState === "success" && "bg-[var(--theme-success)]",
-                          "border-[var(--theme-border)]",
+                          textState === "error" && "bg-[var(--theme-error)]!",
+                          textState === "success" && "bg-[var(--theme-success)]!",
                         )}
-                        placeholder="Text input"
+                        placeholder="Текстовое поле ввода"
                       />
-                      <div className="flex h-10 items-center gap-2 border-theme border-[var(--theme-border)] px-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                        <Search className="h-4 w-4" />
+                      <div className="flex h-10 items-center gap-2 border-theme border-[var(--theme-border)] px-3 bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme">
+                        <Search className="h-4 w-4 text-[var(--theme-foreground)]/50" />
                         <input
-                          className="w-full border-0 bg-transparent p-0 outline-none"
-                          placeholder="Input with icon"
+                          className="w-full border-0 bg-transparent p-0 outline-none text-sm placeholder:text-[var(--theme-foreground)]/50"
+                          placeholder="Поиск с иконкой"
                         />
                       </div>
-                      <textarea
+                      <Textarea
                         value={textareaValue}
                         onChange={(event) => setTextareaValue(event.target.value)}
                         className={cn(
-                          "min-h-24 w-full border-theme px-3 py-2 outline-none rounded-theme shadow-theme focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)]",
-                          textareaState === "error" && "bg-[var(--theme-error)]",
-                          textareaState === "success" && "bg-[var(--theme-success)]",
-                          textareaState === "idle" && "bg-[var(--theme-surface)]",
-                          "border-[var(--theme-border)]",
+                          "min-h-24",
+                          textareaState === "error" && "bg-[var(--theme-error)]!",
+                          textareaState === "success" && "bg-[var(--theme-success)]!",
                         )}
-                        placeholder="Textarea"
+                        placeholder="Многострочный ввод (Textarea)"
                       />
                       <div className="grid gap-3 md:grid-cols-2">
-                        <div className="border-theme border-[var(--theme-border)] p-3 text-sm rounded-theme shadow-theme" style={{ background: "var(--theme-error)" }}>
-                          Text input error: minimum 4 characters
+                        <div className="border-theme border-[var(--theme-border)] p-3 text-xs rounded-theme shadow-theme bg-[var(--theme-error)] text-[var(--theme-foreground)]">
+                          Ошибка ввода: минимум 4 символа
                         </div>
-                        <div className="border-theme border-[var(--theme-border)] p-3 text-sm rounded-theme shadow-theme" style={{ background: "var(--theme-success)" }}>
-                          Textarea success: minimum 12 characters
+                        <div className="border-theme border-[var(--theme-border)] p-3 text-xs rounded-theme shadow-theme bg-[var(--theme-success)] text-[var(--theme-foreground)]">
+                          Успех ввода: минимум 12 символов
                         </div>
                       </div>
                     </div>
@@ -396,154 +382,135 @@ export function CoreWebPage() {
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-2">
-                  <Section title="Select / Switch / Checkbox / Radio">
+                  <Section title="Выбор / Свитч / Чекбокс / Радио">
                     <div className="space-y-4">
-                      <Select.Root defaultValue="default">
-                        <Select.Trigger className="flex h-10 w-full items-center justify-between border-theme border-[var(--theme-border)] px-3 text-sm rounded-theme shadow-theme hover:bg-[var(--theme-muted)] theme-interactive">
-                          <Select.Value placeholder="Select item" />
-                          <Select.Icon>
-                            <ChevronDown className="h-4 w-4" />
-                          </Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Content className="border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme theme-backdrop">
-                            <Select.Viewport>
-                              <Select.Item value="default" className="px-3 py-2 text-sm outline-none hover:bg-[var(--theme-muted)] cursor-pointer">Default</Select.Item>
-                              <Select.Item value="compact" className="px-3 py-2 text-sm outline-none hover:bg-[var(--theme-muted)] cursor-pointer">Compact</Select.Item>
-                              <Select.Item value="strict" className="px-3 py-2 text-sm outline-none hover:bg-[var(--theme-muted)] cursor-pointer">Strict</Select.Item>
-                            </Select.Viewport>
-                          </Select.Content>
-                        </Select.Portal>
-                      </Select.Root>
+                      <Select defaultValue="default">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите вариант" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="default">По умолчанию</SelectItem>
+                          <SelectItem value="compact">Компактный</SelectItem>
+                          <SelectItem value="strict">Строгий режим</SelectItem>
+                        </SelectContent>
+                      </Select>
 
-                      <div className="flex items-center justify-between border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                        <span>Theme switch</span>
-                        <Switch.Root
+                      <div className="flex items-center justify-between border-theme border-[var(--theme-border)] px-3 py-2 bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme">
+                        <span>Переключатель темы</span>
+                        <Switch
                           checked={switchEnabled}
                           onCheckedChange={setSwitchEnabled}
-                          className="flex h-6 w-11 items-center border-theme border-[var(--theme-border)] px-1 rounded-theme shadow-theme data-[state=checked]:bg-[var(--theme-primary)] theme-interactive"
-                        >
-                          <Switch.Thumb className="block h-4 w-4 border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme duration-theme ease-theme transition-transform data-[state=checked]:translate-x-5" />
-                        </Switch.Root>
+                        />
                       </div>
 
-                      <label className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme hover:bg-[var(--theme-muted)] cursor-pointer theme-interactive">
-                        <Checkbox.Root
+                      <label className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 bg-[var(--theme-surface)] rounded-theme shadow-theme hover:bg-[var(--theme-muted)] cursor-pointer theme-interactive">
+                        <Checkbox
                           checked={checkboxChecked}
                           onCheckedChange={(checked) => setCheckboxChecked(checked === true)}
-                          className="flex h-5 w-5 items-center justify-center border-theme border-[var(--theme-border)] rounded-theme bg-[var(--theme-surface)] hover:bg-[var(--theme-muted)] data-[state=checked]:bg-[var(--theme-primary)] data-[state=checked]:text-[var(--theme-primary-foreground)] transition-all duration-theme ease-theme"
-                        >
-                          <Checkbox.Indicator>
-                            <Check className="h-4 w-4" />
-                          </Checkbox.Indicator>
-                        </Checkbox.Root>
-                        Checkbox option
+                        />
+                        Выбор чекбокса
                       </label>
 
-                      <RadioGroup.Root value={radioValue} onValueChange={setRadioValue} className="space-y-2">
+                      <RadioGroup value={radioValue} onValueChange={setRadioValue}>
                         {[
-                          ["a", "Option A"],
-                          ["b", "Option B"],
+                          ["a", "Вариант А"],
+                          ["b", "Вариант Б"],
                         ].map(([value, label]) => (
-                          <label key={value} className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme shadow-theme hover:bg-[var(--theme-muted)] cursor-pointer theme-interactive">
-                            <RadioGroup.Item value={value} className="relative flex items-center justify-center h-5 w-5 border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme transition-all duration-theme ease-theme">
-                              <RadioGroup.Indicator className="relative flex items-center justify-center h-full w-full after:block after:h-2 after:w-2 after:bg-[var(--theme-primary)] after:rounded-theme" />
-                            </RadioGroup.Item>
+                          <label key={value} className="flex items-center gap-3 border-theme border-[var(--theme-border)] px-3 py-2 bg-[var(--theme-surface)] rounded-theme shadow-theme hover:bg-[var(--theme-muted)] cursor-pointer theme-interactive">
+                            <RadioGroupItem value={value} />
                             {label}
                           </label>
                         ))}
-                      </RadioGroup.Root>
+                      </RadioGroup>
                     </div>
                   </Section>
 
-                  <Section title="Cards / Badges / Tooltip">
+                  <Section title="Карточки / Бейджи / Тултипы">
                     <div className="space-y-3">
-                      <div className="border-theme border-[var(--theme-border)] p-4 rounded-theme shadow-theme transition-all duration-theme ease-theme">
+                      <div className="border-theme border-[var(--theme-border)] p-4 bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <div className="text-lg font-medium">System Card</div>
-                            <p className="mt-2 text-sm leading-6">
-                              Border-defined card with parameterized rounding, shadows, and spacing.
+                            <div className="text-lg font-medium">Системная карточка</div>
+                            <p className="mt-2 text-sm leading-6 text-[var(--theme-foreground)]/80">
+                              Карточка с параметризованным скруглением рамок, тенями и отступами, унаследованными от активной дизайн-системы.
                             </p>
                           </div>
-                          <span className="border-theme border-[var(--theme-border)] px-2 py-1 text-xs uppercase rounded-theme">
-                            Stable
+                          <span className="border-theme border-[var(--theme-border)] px-2 py-1 text-xs uppercase rounded-theme bg-[var(--theme-muted)]">
+                            Стабильно
                           </span>
                         </div>
                       </div>
 
-                      <Tooltip.Root>
-                        <Tooltip.Trigger asChild>
-                          <Button variant="outline">Tooltip Trigger</Button>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Content className="border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 py-2 text-sm rounded-theme shadow-theme transition-all duration-theme ease-theme theme-backdrop" sideOffset={4}>
-                            Zero-motion tooltip
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
+                      <Tooltip>
+                        <TooltipTrigger render={<Button variant="outline" />}>
+                          Наведи для подсказки
+                        </TooltipTrigger>
+                        <TooltipContent sideOffset={4}>
+                          Параметрический тултип
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </Section>
                 </div>
 
-                <Section title="Header / Sidebar / Dialog">
+                <Section title="Хедер / Сайдбар / Модальные окна">
                   <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
-                    <div className="border-theme border-[var(--theme-border)] rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                      <div className="border-b-theme border-[var(--theme-border)] px-3 py-3 font-medium">Sidebar</div>
+                    <div className="border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme">
+                      <div className="border-b-theme border-[var(--theme-border)] px-3 py-3 font-medium">Боковое меню</div>
                       <div className="space-y-2 p-3 text-sm">
-                        <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme hover:bg-[var(--theme-muted)] cursor-pointer transition-all duration-theme ease-theme">Overview</div>
-                        <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme hover:bg-[var(--theme-muted)] cursor-pointer transition-all duration-theme ease-theme">Prompts</div>
-                        <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme hover:bg-[var(--theme-muted)] cursor-pointer transition-all duration-theme ease-theme">Favorites</div>
+                        <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme hover:bg-[var(--theme-muted)] cursor-pointer transition-all duration-theme ease-theme bg-[var(--theme-surface)]">Обзор</div>
+                        <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme hover:bg-[var(--theme-muted)] cursor-pointer transition-all duration-theme ease-theme bg-[var(--theme-surface)]">Промпты</div>
+                        <div className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme hover:bg-[var(--theme-muted)] cursor-pointer transition-all duration-theme ease-theme bg-[var(--theme-surface)]">Избранное</div>
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between border-theme border-[var(--theme-border)] px-4 py-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
+                      <div className="flex items-center justify-between border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] px-4 py-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
                         <div className="flex items-center gap-2">
                           <Menu className="h-4 w-4" />
-                          Header bar
+                          Панель заголовка (Header)
                         </div>
-                        <Button variant="outline" onClick={() => setDialogOpen(true)}>Open Dialog</Button>
+                        <Button variant="outline" onClick={() => setDialogOpen(true)}>Открыть диалог</Button>
                       </div>
 
-                      <div className="border-theme border-[var(--theme-border)] p-4 text-sm leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                        This section demonstrates layout primitives required by the specification:
-                        header, sidebar, and modal dialog inside the same rigid system.
+                      <div className="border-theme border-[var(--theme-border)] p-4 text-sm leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme bg-[var(--theme-surface)]">
+                        Этот раздел демонстрирует верстку стандартных компоновочных блоков:
+                        хедер, сайдбар и всплывающие окна в рамках одной дизайн-системы.
                       </div>
                     </div>
                   </div>
                 </Section>
               </div>
 
-              <Section title="Prompt Engine">
+              <Section title="Генератор промптов (Prompt Engine)">
                 <div className="space-y-4">
-                  <div className="grid gap-px bg-[var(--theme-border)] text-sm">
+                  <div className="grid gap-px bg-[var(--theme-border)] text-sm border border-[var(--theme-border)]">
                     {[
-                      ["Mode", palette.mode],
-                      ["Primary", palette.colors.primary],
-                      ["Background", palette.colors.background],
-                      ["Surface", palette.colors.surface],
-                      ["Border", palette.colors.border],
+                      ["Режим темы", palette.mode === "dark" ? "Темный" : "Светлый"],
+                      ["Основной цвет", palette.colors.primary],
+                      ["Фоновый цвет", palette.colors.background],
+                      ["Цвет поверхности", palette.colors.surface],
+                      ["Цвет границы", palette.colors.border],
                     ].map(([label, value]) => (
-                      <div key={label} className="grid grid-cols-[120px_minmax(0,1fr)] bg-[var(--theme-surface)] px-3 py-2">
-                        <span className="uppercase tracking-[0.15em] text-xs">{label}</span>
-                        <span>{value}</span>
+                      <div key={label} className="grid grid-cols-[140px_minmax(0,1fr)] bg-[var(--theme-surface)] px-3 py-2">
+                        <span className="uppercase tracking-[0.15em] text-[var(--theme-foreground)]/60 text-[10px]">{label}</span>
+                        <span className="font-mono text-xs">{value}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-theme border-[var(--theme-border)] p-4 text-sm leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                    <div className="text-xs uppercase tracking-[0.2em]">Component Rules</div>
+                  <div className="border-theme border-[var(--theme-border)] p-4 text-sm leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme bg-[var(--theme-surface)]">
+                    <div className="text-xs uppercase tracking-[0.2em] text-[var(--theme-foreground)]/65">Правила для компонентов AI:</div>
                     <div className="mt-3 space-y-2">
                       {theme.componentRules.map((rule) => (
-                        <div key={rule} className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme">
+                        <div key={rule} className="border-theme border-[var(--theme-border)] px-3 py-2 rounded-theme bg-[var(--theme-muted)]/20 text-xs">
                           {rule}
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <pre className="overflow-x-auto border-theme border-[var(--theme-border)] bg-[var(--theme-muted)] p-4 text-xs leading-6 rounded-theme shadow-theme transition-all duration-theme ease-theme">
+                  <pre className="overflow-x-auto border-theme border-[var(--theme-border)] bg-[var(--theme-muted)] p-4 text-[10px] leading-5 rounded-theme shadow-theme transition-all duration-theme ease-theme font-mono">
                     <code>{prompt}</code>
                   </pre>
                 </div>
@@ -552,31 +519,20 @@ export function CoreWebPage() {
           </div>
         </div>
 
-        <Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
-          <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 bg-black/10 z-50" />
-            <Dialog.Content className="fixed left-1/2 top-1/2 w-[min(92vw,520px)] -translate-x-1/2 -translate-y-1/2 border-theme border-[var(--theme-border)] bg-[var(--theme-surface)] rounded-theme shadow-theme transition-all duration-theme ease-theme theme-backdrop z-50">
-              <div className="flex items-center justify-between border-b-theme border-[var(--theme-border)] px-4 py-3">
-                <Dialog.Title className="text-lg font-medium">{theme.name} Dialog</Dialog.Title>
-                <Dialog.Close asChild>
-                  <button className="border-theme border-[var(--theme-border)] p-2 rounded-theme hover:bg-[var(--theme-muted)] hover:[transform:var(--theme-hover-transform)] transition-all duration-theme ease-theme active:translate-x-[var(--theme-active-translate-x)] active:translate-y-[var(--theme-active-translate-y)] active:shadow-[var(--theme-active-box-shadow)]" aria-label="Close dialog">
-                    <X className="h-4 w-4" />
-                  </button>
-                </Dialog.Close>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent showCloseButton={true}>
+            <DialogTitle>Диалоговое окно стиля {theme.name}</DialogTitle>
+            <div className="space-y-4 text-sm leading-6">
+              <DialogDescription>
+                Диалог полностью наследует параметры набора токенов: фоновую подложку (backdrop), скругление углов, тени и анимационные тайминги.
+              </DialogDescription>
+              <div className="border-theme border-[var(--theme-border)] p-3 rounded-theme shadow-theme transition-all duration-theme ease-theme bg-[var(--theme-muted)]/20">
+                Это подтверждает масштабируемость системы на оверлеи и всплывающие окна.
               </div>
-              <div className="space-y-4 p-4 text-sm leading-6">
-                <p>
-                  The dialog inherits the same rigid geometry: flat surface, border,
-                  radius, shadow, and motion configured by the design tokens.
-                </p>
-                <div className="border-theme border-[var(--theme-border)] p-3 rounded-theme shadow-theme transition-all duration-theme ease-theme">
-                  This confirms the style system can scale across overlays and structural UI.
-                </div>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
-    </Tooltip.Provider>
+    </TooltipPrimitive.Provider>
   );
 }

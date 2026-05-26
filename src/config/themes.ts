@@ -91,6 +91,177 @@ export const sharedPalettes: Palette[] = [
   },
 ];
 
+export const neobrutalismPalettes: Palette[] = [
+  {
+    id: "neobrutalism-yellow",
+    label: "Yellow Pop Art",
+    mode: "light",
+    colors: {
+      primary: "#000000",
+      background: "#FFF066",
+      surface: "#FFFFFF",
+      border: "#000000",
+      muted: "#FFECA1",
+      accent: "#FF4D4D",
+      success: "#52B788",
+      error: "#FF4D4D",
+    },
+  },
+  {
+    id: "neobrutalism-pink",
+    label: "Cyber Pink",
+    mode: "light",
+    colors: {
+      primary: "#000000",
+      background: "#FF9EBB",
+      surface: "#FFFFFF",
+      border: "#000000",
+      muted: "#FFC2D4",
+      accent: "#C77DFF",
+      success: "#52B788",
+      error: "#FF4D4D",
+    },
+  },
+  ...sharedPalettes,
+];
+
+export const glassmorphismPalettes: Palette[] = [
+  {
+    id: "glass-aurora",
+    label: "Aurora Blue",
+    mode: "dark",
+    colors: {
+      primary: "#E0E7FF",
+      background: "#0F172A",
+      surface: "rgba(30, 41, 59, 0.4)",
+      border: "rgba(255, 255, 255, 0.1)",
+      muted: "#1E1B4B",
+      accent: "#818CF8",
+      success: "#10B981",
+      error: "#EF4444",
+    },
+  },
+  {
+    id: "glass-rose",
+    label: "Rose Quartz",
+    mode: "light",
+    colors: {
+      primary: "#4C1D95",
+      background: "#FFF1F2",
+      surface: "rgba(255, 255, 255, 0.4)",
+      border: "rgba(0, 0, 0, 0.1)",
+      muted: "#FDE2E4",
+      accent: "#EC4899",
+      success: "#10B981",
+      error: "#EF4444",
+    },
+  },
+  ...sharedPalettes,
+];
+
+export const terminalPalettes: Palette[] = [
+  {
+    id: "terminal-green",
+    label: "Phosphor Green",
+    mode: "dark",
+    colors: {
+      primary: "#39FF14",
+      background: "#0A0F0D",
+      surface: "#0E1412",
+      border: "#39FF14",
+      muted: "#0C2511",
+      accent: "#1B4D22",
+      success: "#39FF14",
+      error: "#FF3333",
+    },
+  },
+  {
+    id: "terminal-amber",
+    label: "Phosphor Amber",
+    mode: "dark",
+    colors: {
+      primary: "#FFB000",
+      background: "#0F0C08",
+      surface: "#14100A",
+      border: "#FFB000",
+      muted: "#2B1D0A",
+      accent: "#6B4700",
+      success: "#FFB000",
+      error: "#FF3333",
+    },
+  },
+  ...sharedPalettes.filter(p => p.mode === "dark"),
+];
+
+export const origamiPalettes: Palette[] = [
+  {
+    id: "origami-pastel",
+    label: "Pastel Peach",
+    mode: "light",
+    colors: {
+      primary: "#4A3B32",
+      background: "#FFF0E5",
+      surface: "#FFFBF7",
+      border: "#D2B48C",
+      muted: "#F5D6C6",
+      accent: "#FFB7B2",
+      success: "#B5EAD7",
+      error: "#FF9AA2",
+    },
+  },
+  {
+    id: "origami-lavender",
+    label: "Pastel Lavender",
+    mode: "light",
+    colors: {
+      primary: "#3D3A45",
+      background: "#F3E8FF",
+      surface: "#FAF5FF",
+      border: "#C084FC",
+      muted: "#E9D5FF",
+      accent: "#D6BCFA",
+      success: "#C6F6D5",
+      error: "#FED7D7",
+    },
+  },
+  ...sharedPalettes.filter(p => p.mode === "light"),
+];
+
+export const diffuseGlowPalettes: Palette[] = [
+  {
+    id: "glow-cyberpunk",
+    label: "Neon Cyberpunk",
+    mode: "dark",
+    colors: {
+      primary: "#00FFFF",
+      background: "#0D0B18",
+      surface: "rgba(22, 18, 36, 0.2)",
+      border: "#FF007F",
+      muted: "#1B1635",
+      accent: "#FF007F",
+      success: "#39FF14",
+      error: "#FF3333",
+    },
+  },
+  {
+    id: "glow-sunset",
+    label: "Retrowave Sunset",
+    mode: "dark",
+    colors: {
+      primary: "#FF8C00",
+      background: "#1B0C1B",
+      surface: "rgba(44, 17, 44, 0.2)",
+      border: "#FF007F",
+      muted: "#321432",
+      accent: "#FF007F",
+      success: "#4CAF50",
+      error: "#F44336",
+    },
+  },
+  ...sharedPalettes.filter(p => p.mode === "dark"),
+];
+
+
 export const themes: ThemeConfig[] = [
   {
     id: "01-wireframe",
@@ -154,7 +325,7 @@ export const themes: ThemeConfig[] = [
       "When active, interactive elements must translate (4px, 4px) and reduce shadow to simulate physical pressing.",
       "High contrast palettes inspired by pop-art and retro-web aesthetics.",
     ],
-    palettes: sharedPalettes,
+    palettes: neobrutalismPalettes,
   },
   {
     id: "03-glassmorphism",
@@ -186,7 +357,7 @@ export const themes: ThemeConfig[] = [
       "Soft double-layer shadows (outer blur + inner inset highlight) represent the physical glass edge.",
       "Animations must use smooth easing transitions simulating friction and light.",
     ],
-    palettes: sharedPalettes,
+    palettes: glassmorphismPalettes,
   },
   {
     id: "04-kinetic-liquid",
@@ -410,7 +581,7 @@ export const themes: ThemeConfig[] = [
       "Animations must use stepped easing functions (steps) to mimic early hardware terminal output.",
       "Surfaces should remain transparent, letting background grid lines shine through the CRT glass.",
     ],
-    palettes: sharedPalettes,
+    palettes: terminalPalettes,
   },
   {
     id: "11-folded-origami",
@@ -442,7 +613,7 @@ export const themes: ThemeConfig[] = [
       "Overlapping layers must employ mix-blend-mode: multiply to simulate light absorption in paper folds.",
       "Borders remain thin and simple, avoiding rounded geometry or heavy decor.",
     ],
-    palettes: sharedPalettes,
+    palettes: origamiPalettes,
   },
   {
     id: "12-haptic-sharp",
@@ -506,7 +677,7 @@ export const themes: ThemeConfig[] = [
       "Floating surfaces use Gaussian blurs and color-dodge blend mode to saturate backing layers.",
       "Shadow dimensions dynamically reflect text currentColor, maintaining perfect chroma-alignment.",
     ],
-    palettes: sharedPalettes,
+    palettes: diffuseGlowPalettes,
   },
   {
     id: "14-macro-typography",
